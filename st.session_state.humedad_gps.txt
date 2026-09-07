@@ -1,0 +1,46 @@
+import streamlit as st
+import pandas as pd
+from streamlit_geolocation import streamlit_geolocation
+
+st.title("🚜 App Agrícola Inteligente con GPS")
+
+# --- 1. Obtener ubicación GPS ---
+location = streamlit_geolocation()
+
+# --- 2. Lógica cuando la ubicación está disponible ---
+if isinstance(location, dict) and location.get("latitude") is not None:
+    lat = location["latitude"]
+    lon = location["longitude"]
+    
+    st.success(f"Ubicación obtenida: {lat:.5f}, {lon:.5f}")
+    
+    # --- VISUALIZAR EN EL MAPA ---
+    df_ubicacion = pd.DataFrame({"lat": [lat], "lon": [lon]})
+    st.map(df_ubicacion, zoom=14)  # Ajusta el zoom según lo necesites
+
+    st.divider()
+    st.subheader("Datos Automatizados")
+
+    # --- AUTOMATIZAR OTRAS VARIABLES (Ejemplo Humedad) ---
+    # NOTA: Aquí NO usamos "st.session_state.hum" porque probablemente esté ligado a un widget.
+    # Usamos una clave nueva o una variable directa.
+
+    # Simulación de cálculo (en la realidad, aquí consultarías una API de clima como OpenWeatherMap).
+    # Podemos usar las coordenadas para simular una zona u obtener datos reales si conectas una API.
+    humedad_calculada = 60 + round((lat % 1) * 40)  # Ejemplo matemático
+    temperatura_calculada = 25 + round((lon % 1) * 10)
+
+    # Guardamos el valor en una clave que NO está ligada a un widget de entrada
+    st.session_state['humedad_gps'] = humedad_calculada
+    
+    # Mostramos los resultados
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric(label="💧 Humedad (GPS)", value=f"{humedad_calculada}%")
+    with col2:
+        st.metric(label="🌡️ Temperatura (GPS)", value=f"{temperatura_calculada}°C")
+        
+    st.info("La humedad se ha actualizado automáticamente según tu posición GPS.")
+
+else:
+    st.info("🛰️ Por favor, pulsa el botón para activar el GPS y ver el mapa de tu ubicación actual.")

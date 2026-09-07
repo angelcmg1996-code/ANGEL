@@ -29,7 +29,7 @@ st.title("🌾 AgroInteligente - Asistente de Riego con IA")
 # ... el resto de tu código igual ...
 st.set_page_config(page_title="🌾 AgroInteligente", layout="wide")
 st.title("🌾 AgroInteligente - Asistente de Riego con IA")
-st.markdown("---")
+st.markdown("love")
 
 def generar_datos_campo(n=3000):
     np.random.seed(42)

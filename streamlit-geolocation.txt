@@ -1,0 +1,20 @@
+import streamlit as st
+import pandas as pd
+from streamlit_geolocation import streamlit_geolocation
+
+st.title("Detector de Ubicación")
+
+# El componente mostrará un botón para solicitar la ubicación
+location = streamlit_geolocation()
+
+# Al presionar el botón, devuelve un diccionario con los datos
+if isinstance(location, dict) and location.get("latitude") is not None:
+    lat = location["latitude"]
+    lon = location["longitude"]
+
+    st.write(f"**Coordenadas:** ({lat:.6f}, {lon:.6f})")
+
+    # Puedes usar st.map para visualizarlo directamente
+    st.map(pd.DataFrame([{"lat": lat, "lon": lon}]), zoom=13)
+else:
+    st.info("Pulsa el botón para obtener tu ubicación.")

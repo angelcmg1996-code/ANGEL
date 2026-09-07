@@ -8,7 +8,21 @@ import joblib
 import os
 from datetime import datetime, timedelta
 import random
+import streamlit as st
 
+# Configuración principal de la página (DEBE SER LO PRIMERO)
+st.set_page_config(
+    page_title="AgroInteligente", 
+    page_icon="🌾", # Puedes poner un emoji o la ruta a una imagen .ico
+    layout="wide"
+)
+
+# Insertar el logo en la barra lateral
+# (Si usas una versión reciente de Streamlit usa use_container_width=True)
+st.sidebar.image("logo.png", use_container_width=True) 
+
+st.sidebar.title("Menú de Navegación")
+# ... El resto de tu código
 # ========== CÓDIGO PWA PARA ANDROID ==========
 # Esto permite que la app sea instalable en Android
 PWA_HTML = """

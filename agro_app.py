@@ -23,10 +23,6 @@ if ('serviceWorker' in navigator) {
 """
 st.markdown(PWA_HTML, unsafe_allow_html=True)
 # =============================================
-
-st.set_page_config(page_title="🌾 AgroInteligente", layout="wide")
-st.title("🌾 AgroInteligente - Asistente de Riego con IA")
-# ... el resto de tu código igual ...
 st.set_page_config(page_title="🌾 AgroInteligente", layout="wide")
 st.title("🌾 AgroInteligente - Asistente de Riego con IA")
 st.markdown("---")

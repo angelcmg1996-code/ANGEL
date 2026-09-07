@@ -10,7 +10,6 @@ from datetime import datetime, timedelta
 import random
 
 # ========== CÓDIGO PWA PARA ANDROID ==========
-# Esto permite que la app sea instalable en Android
 PWA_HTML = """
 <script>
 if ('serviceWorker' in navigator) {
@@ -23,6 +22,7 @@ if ('serviceWorker' in navigator) {
 """
 st.markdown(PWA_HTML, unsafe_allow_html=True)
 # =============================================
+
 st.set_page_config(page_title="🌾 AgroInteligente", layout="wide")
 st.title("🌾 AgroInteligente - Asistente de Riego con IA")
 st.markdown("---")
@@ -82,14 +82,17 @@ def recomendar(humedad, temp, lluvia):
         volumen = max(5, min(55, volumen))
         return {'regar': True, 'volumen': round(volumen, 1), 'mensaje': f"💧 Recomendación: Riega con {round(volumen, 1)} litros por metro cuadrado.", 'color': '#28a745'}
     else:
-        return {'regar': False, 'volumen': 0, 'mensaje': "☀️ Recomendación: No es necesario regar.", 'color': '#dc3545'}
+        return {'regar': False, 'volumen': 0, 'mensaje': "☀️ Recomendación: No es necesario regar. La humedad es suficiente.", 'color': '#dc3545'}
 
+# ========== INTERFAZ PRINCIPAL ==========
 col1, col2 = st.columns([1, 2])
+
 with col1:
     st.subheader("🧪 Datos del Sensor")
     humedad = st.slider("💧 Humedad del Suelo (%)", 10, 90, 45, key="hum")
     temperatura = st.slider("🌡️ Temperatura (°C)", 10, 45, 30, key="temp")
     lluvia = st.slider("☔ Lluvia últimas 24h (mm)", 0.0, 20.0, 2.0, key="lluv")
+    
     if st.button("🎲 Simular Lectura Aleatoria"):
         temp_rand = random.uniform(15, 40)
         hum_rand = max(15, min(85, 70 - 0.6*(temp_rand-20) + random.gauss(0, 5)))
@@ -98,11 +101,13 @@ with col1:
         st.session_state.temp = round(temp_rand)
         st.session_state.lluv = round(lluv_rand, 1)
         st.rerun()
+    
     resultado = recomendar(st.session_state.hum, st.session_state.temp, st.session_state.lluv)
     st.markdown("---")
     st.subheader("📋 Decisión de la IA")
     st.markdown(f"<div style='background-color:{resultado['color']}; padding:15px; border-radius:10px; color:white; font-size:18px;'>{resultado['mensaje']}</div>", unsafe_allow_html=True)
-    if resultado['regar']: st.metric(label="🚿 Volumen", value=f"{resultado['volumen']} L/m²")
+    if resultado['regar']: 
+        st.metric(label="🚿 Volumen", value=f"{resultado['volumen']} L/m²")
 
 with col2:
     st.subheader("📊 Tendencias Históricas")
@@ -112,16 +117,28 @@ with col2:
     ax2 = ax.twinx()
     riego_points = df_plot[df_plot['regar'] == 1]
     ax2.scatter(riego_points['fecha'], riego_points['volumen'], color='green', s=30, label='Riego (L)', alpha=0.8)
-    ax.set_xlabel('Tiempo'); ax.set_ylabel('Humedad (%)'); ax2.set_ylabel('Volumen (L)')
-    ax.legend(loc='upper left'); ax2.legend(loc='upper right')
-    plt.xticks(rotation=45); plt.tight_layout()
+    ax.set_xlabel('Tiempo')
+    ax.set_ylabel('Humedad (%)')
+    ax2.set_ylabel('Volumen (L)')
+    ax.legend(loc='upper left')
+    ax2.legend(loc='upper right')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
     st.pyplot(fig)
+    
     st.subheader("📋 Últimas Decisiones")
     historial = []
     for i in range(5):
-        h = np.random.uniform(30, 70); t = np.random.uniform(18, 38); l = np.random.exponential(3)
+        h = np.random.uniform(30, 70)
+        t = np.random.uniform(18, 38)
+        l = np.random.exponential(3)
         res = recomendar(h, t, l)
-        historial.append({'Hora': (datetime.now() - timedelta(minutes=i*15)).strftime('%H:%M'), 'Humedad': f"{h:.1f}%", 'Decisión': '💧 Regar' if res['regar'] else '☀️ No regar', 'Volumen': f"{res['volumen']} L" if res['regar'] else '--'})
+        historial.append({
+            'Hora': (datetime.now() - timedelta(minutes=i*15)).strftime('%H:%M'),
+            'Humedad': f"{h:.1f}%",
+            'Decisión': '💧 Regar' if res['regar'] else '☀️ No regar',
+            'Volumen': f"{res['volumen']} L" if res['regar'] else '--'
+        })
     st.dataframe(pd.DataFrame(historial), use_container_width=True)
 
 st.markdown("---")
